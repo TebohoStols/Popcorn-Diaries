@@ -1,0 +1,82 @@
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+    <h1 class="jersey-25-regular">Logged Movies</h1>
+
+    <% if (movies.length === 0) { %>
+        <p>No movies logged yet.</p>
+    <% } else { %>
+        <ul class="list-group">
+            <% movies.forEach(movie => { %>
+                <li class="list-group-item">
+                    <h2 class="jersey-25-regular view-title"><%= movie.title %></h2>
+                    <p><strong>Director:</strong> <%= movie.director %></p>
+                    <p><strong>Genre:</strong> <%= movie.genre %></p>
+                    <p><strong>Release Year:</strong> <%= movie.year %></p>
+                    <p><strong>Description:</strong> <%= movie.description %></p>
+
+                    <!-- Edit Button -->
+                    <a href="/edit/<%= movie.id %>" class="btn btn-warning btn-sm me-2">Edit</a>
+
+                    <!-- Delete Button -->
+                    <button onclick="deleteMovie('<%= movie.id %>')" class="btn btn-danger btn-sm">Delete</button>
+                </li>
+            <% }); %>
+        </ul>
+    <% } %>
+</div>
+
+<script>
+    function deleteMovie(id) {
+        if (confirm('Are you sure you want to delete this movie?')) {
+            fetch(`/delete/${id}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success notification
+                        Toastify({
+                            text: "Movie deleted successfully!",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#136F63",
+                                color: "#FFFFFF",
+                                borderRadius: "10px",
+                                padding: "15px 25px",
+                                fontSize: "16px",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                            }
+                        }).showToast();
+    
+                        // Reload after a short delay
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        throw new Error('Delete operation failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show error notification
+                    Toastify({
+                        text: "Failed to delete the movie. Please try again.",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "#F34213",
+                            color: "#FFFFFF",
+                            borderRadius: "10px",
+                            padding: "15px 25px",
+                            fontSize: "16px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                        }
+                    }).showToast();
+                });
+        }
+    }
+    </script>
+
+<%- include('partials/footer') %>
